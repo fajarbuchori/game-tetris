@@ -184,3 +184,51 @@ setInterval(() => {
 
 drawBoard();
 drawHold();
+
+// ===== SWIPE CONTROL (MOBILE) =====
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+
+const SWIPE_THRESHOLD = 30; // sensitif swipe
+
+canvas.addEventListener('touchstart', e => {
+  const touch = e.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+}, { passive: true });
+
+canvas.addEventListener('touchend', e => {
+  if (gameOver) return;
+
+  touchEndX = e.changedTouches[0].clientX;
+  touchEndY = e.changedTouches[0].clientY;
+
+  const dx = touchEndX - touchStartX;
+  const dy = touchEndY - touchStartY;
+
+  if (Math.abs(dx) > Math.abs(dy)) {
+    // Swipe horizontal
+    if (dx > SWIPE_THRESHOLD) {
+      // Kanan
+      piece.x++;
+      if (collision()) piece.x--;
+    } else if (dx < -SWIPE_THRESHOLD) {
+      // Kiri
+      piece.x--;
+      if (collision()) piece.x++;
+    }
+  } else {
+    // Swipe vertical
+    if (dy > SWIPE_THRESHOLD) {
+      // Bawah
+      moveDown();
+    } else if (dy < -SWIPE_THRESHOLD) {
+      // Atas (Rotate)
+      rotate();
+    }
+  }
+
+  drawBoard();
+}, { passive: true });
